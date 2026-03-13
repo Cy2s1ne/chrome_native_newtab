@@ -28,22 +28,26 @@ body.loaded {
     }
 
     .search-box {
-        background: #303134;
-        border: 1px solid #5f6368;
+        background: #2f3033;
+        border: 1px solid #4b4d52;
     }
 
     .search-box:hover, .search-box:focus-within {
-        background-color: #303134;
-        box-shadow: 0 1px 6px rgba(0,0,0,.5);
-        border-color: rgba(223,225,229,0);
+        background-color: #35373b;
+        box-shadow: 0 10px 24px rgba(0,0,0,.34);
+        border-color: #606369;
     }
 
     #search-input {
-        color: #e8eaed;
+        color: #eceef2;
+    }
+
+    #search-input::placeholder {
+        color: #a2a6ad;
     }
 
     .search-icon svg {
-        fill: #9aa0a6;
+        fill: #a1a6af;
     }
 
     #switcher-btn:hover {
@@ -64,8 +68,20 @@ body.loaded {
         background-color: #3c4043;
     }
 
-    .settings-icon svg path, .clear-bg-icon svg path {
-        fill: #e8eaed;
+    .settings-icon,
+    .clear-bg-icon {
+        background-color: rgba(26, 27, 30, 0.56);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    .settings-icon:hover,
+    .clear-bg-icon:hover {
+        background-color: rgba(43, 45, 50, 0.76);
+    }
+
+    .settings-icon svg path:not([fill="none"]),
+    .clear-bg-icon svg path:not([fill="none"]) {
+        fill: #d7dbe3;
     }
 }
 
@@ -218,8 +234,13 @@ body.loaded {
     bottom: 20px;
     right: 20px;
     cursor: pointer;
-    padding: 8px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background-color: rgba(255, 255, 255, 0.1);
     transition: background-color 0.2s;
 }
@@ -233,12 +254,22 @@ body.loaded {
     bottom: 20px;
     right: 70px; /* 位于设置按钮左侧 */
     cursor: pointer;
-    padding: 8px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background-color: rgba(255, 255, 255, 0.1);
     transition: background-color 0.2s;
 }
 
 .clear-bg-icon:hover {
     background-color: rgba(255, 255, 255, 0.2);
+}
+
+.settings-icon svg,
+.clear-bg-icon svg {
+    display: block;
 }
