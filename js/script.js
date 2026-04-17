@@ -55,6 +55,7 @@ function init() {
 
     renderMenu();
     setupEventListeners();
+    setupInputPreferences();
     
     // 启动时间更新
     updateTime();
@@ -64,6 +65,16 @@ function init() {
     setTimeout(() => {
         document.body.classList.add('loaded');
     }, 50);
+}
+
+function setupInputPreferences() {
+    // 尽早聚焦搜索框，减少手动切换输入的动作。
+    setTimeout(() => {
+        searchInput.focus({ preventScroll: true });
+    }, 0);
+
+    // 尝试向浏览器表达“优先启用输入法”的意图（部分平台可能忽略）。
+    searchInput.style.imeMode = 'active';
 }
 
 function loadBackground() {
