@@ -38,6 +38,154 @@
         <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="#5f6368"/></svg>
     </div>
     <input type="file" id="bg-upload" accept="image/*" style="display: none;">
+
+    <!-- 设置面板 -->
+    <div id="settings-panel" class="settings-panel">
+        <div class="settings-content">
+            <div class="settings-header">
+                <h2>设置</h2>
+                <button id="close-settings-btn" class="close-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+
+            <div class="settings-body">
+                <!-- 颜色设置 -->
+                <div class="settings-section">
+                    <h3>颜色</h3>
+                    <div class="color-group">
+                        <label>
+                            <span>背景颜色</span>
+                            <div class="color-input-wrapper">
+                                <input type="color" id="bg-color" value="#ffffff">
+                                <input type="text" id="bg-color-text" class="color-text" value="#ffffff">
+                            </div>
+                        </label>
+                        <label>
+                            <span>文字颜色</span>
+                            <div class="color-input-wrapper">
+                                <input type="color" id="text-color" value="#202124">
+                                <input type="text" id="text-color-text" class="color-text" value="#202124">
+                            </div>
+                        </label>
+                        <label>
+                            <span>搜索框背景</span>
+                            <div class="color-input-wrapper">
+                                <input type="color" id="search-bg-color" value="#ffffff">
+                                <input type="text" id="search-bg-color-text" class="color-text" value="#ffffff">
+                            </div>
+                        </label>
+                        <label>
+                            <span>搜索框边框</span>
+                            <div class="color-input-wrapper">
+                                <input type="color" id="search-border-color" value="#dfe1e5">
+                                <input type="text" id="search-border-color-text" class="color-text" value="#dfe1e5">
+                            </div>
+                        </label>
+                        <label>
+                            <span>搜索框悬停边框</span>
+                            <div class="color-input-wrapper">
+                                <input type="color" id="search-border-hover-color" value="#dfe1e5">
+                                <input type="text" id="search-border-hover-color-text" class="color-text" value="#dfe1e5">
+                            </div>
+                        </label>
+                        <label>
+                            <span>搜索框阴影</span>
+                            <div class="color-input-wrapper">
+                                <input type="color" id="search-shadow-color" value="#000000">
+                                <input type="text" id="search-shadow-color-text" class="color-text" value="#000000">
+                            </div>
+                        </label>
+                        <label>
+                            <span>按钮背景</span>
+                            <div class="color-input-wrapper">
+                                <input type="color" id="btn-bg-color" value="#ffffff">
+                                <input type="text" id="btn-bg-color-text" class="color-text" value="#ffffff">
+                            </div>
+                        </label>
+                        <label>
+                            <span>图标颜色</span>
+                            <div class="color-input-wrapper">
+                                <input type="color" id="icon-color" value="#9aa0a6">
+                                <input type="text" id="icon-color-text" class="color-text" value="#9aa0a6">
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 搜索框设置 -->
+                <div class="settings-section">
+                    <h3>搜索框</h3>
+                    <div class="slider-group">
+                        <label>
+                            <span>搜索框宽度: <b id="search-width-value">100%</b></span>
+                            <input type="range" id="search-width" min="50" max="100" value="100">
+                        </label>
+                        <label>
+                            <span>搜索框高度: <b id="search-height-value">64px</b></span>
+                            <input type="range" id="search-height" min="40" max="100" value="64">
+                        </label>
+                        <label>
+                            <span>搜索框圆角: <b id="search-radius-value">30px</b></span>
+                            <input type="range" id="search-radius" min="0" max="50" value="30">
+                        </label>
+                        <label>
+                            <span>搜索框上边距: <b id="search-margin-top-value">0px</b></span>
+                            <input type="range" id="search-margin-top" min="-200" max="200" value="0">
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Logo 设置 -->
+                <div class="settings-section">
+                    <h3>Logo</h3>
+                    <div class="slider-group">
+                        <label>
+                            <span>Logo 高度: <b id="logo-height-value">110px</b></span>
+                            <input type="range" id="logo-height" min="50" max="200" value="110">
+                        </label>
+                        <label>
+                            <span>Logo 下边距: <b id="logo-margin-value">38px</b></span>
+                            <input type="range" id="logo-margin" min="0" max="100" value="38">
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 透明度设置 -->
+                <div class="settings-section">
+                    <h3>透明度</h3>
+                    <div class="slider-group">
+                        <label>
+                            <span>背景透明度: <b id="bg-opacity-value">100%</b></span>
+                            <input type="range" id="bg-opacity" min="0" max="100" value="100">
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 打开方式设置 -->
+                <div class="settings-section">
+                    <h3>打开方式</h3>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="open-target" id="open-current" value="current">
+                            <span>在当前标签页打开</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="open-target" id="open-new" value="new" checked>
+                            <span>在新标签页打开</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 操作按钮 -->
+                <div class="settings-actions">
+                    <button id="reset-settings-btn" class="reset-btn">恢复默认</button>
+                    <button id="save-settings-btn" class="save-btn">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="js/script.js"></script>
 </body>
 </html>

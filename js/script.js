@@ -41,6 +41,37 @@ const settingsBtn = document.getElementById('settings-btn');
 const clearBgBtn = document.getElementById('clear-bg-btn');
 const bgUpload = document.getElementById('bg-upload');
 const logoContainer = document.querySelector('.logo-container');
+const settingsPanel = document.getElementById('settings-panel');
+const closeSettingsBtn = document.getElementById('close-settings-btn');
+const saveSettingsBtn = document.getElementById('save-settings-btn');
+const resetSettingsBtn = document.getElementById('reset-settings-btn');
+
+// 默认设置
+const defaultSettings = {
+    // 颜色
+    bgColor: '#ffffff',
+    textColor: '#202124',
+    searchBgColor: '#ffffff',
+    searchBorderColor: '#dfe1e5',
+    searchBorderHoverColor: '#dfe1e5',
+    searchShadowColor: '#000000',
+    btnBgColor: '#ffffff',
+    iconColor: '#9aa0a6',
+    // 搜索框
+    searchWidth: 100,
+    searchHeight: 64,
+    searchRadius: 30,
+    searchMarginTop: 0,
+    // Logo
+    logoHeight: 110,
+    logoMargin: 38,
+    // 透明度
+    bgOpacity: 100,
+    // 打开方式
+    openTarget: 'new'
+};
+
+let currentSettings = { ...defaultSettings };
 
 // 初始化
 function init() {
@@ -53,10 +84,13 @@ function init() {
     // 加载背景图片
     loadBackground();
 
+    // 加载自定义设置
+    loadSettings();
+
     renderMenu();
     setupEventListeners();
     setupInputPreferences();
-    
+
     // 启动时间更新
     updateTime();
     setInterval(updateTime, 1000);
@@ -219,9 +253,10 @@ function setupEventListeners() {
         engineMenu.classList.remove('show');
     });
 
-    // 设置按钮点击
+    // 设置按钮点击 - 打开设置面板
     settingsBtn.addEventListener('click', () => {
-        bgUpload.click();
+        populateSettingsUI();
+        settingsPanel.classList.add('show');
     });
 
     // 清除背景按钮点击
@@ -264,25 +299,245 @@ function setupEventListeners() {
         if (e.key === 'Enter') {
             const query = searchInput.value.trim();
             if (query) {
+                let url;
                 // 检查是否是 URL
                 if (isValidURL(query)) {
-                    let url = query;
-                    if (!/^https?:\/\//i.test(url)) {
-                        url = 'http://' + url;
+                    if (!/^https?:\/\//i.test(query)) {
+                        url = 'http://' + query;
+                    } else {
+                        url = query;
                     }
-                    window.location.href = url;
                 } else {
-                    window.location.href = currentEngine.url + encodeURIComponent(query);
+                    url = currentEngine.url + encodeURIComponent(query);
+                }
+
+                // 根据设置决定打开方式
+                if (currentSettings.openTarget === 'new') {
+                    chrome.tabs.create({ url: url });
+                } else {
+                    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+                        if (tabs[0]) {
+                            chrome.tabs.update(tabs[0].id, { url: url });
+                        } else {
+                            chrome.tabs.create({ url: url });
+                        }
+                    });
                 }
             }
         }
     });
+
+    // 设置面板事件
+    setupSettingsEventListeners();
 }
 
 function isValidURL(string) {
     // 简单的 URL 验证
     const res = string.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);
     return (res !== null);
+}
+
+// 设置相关函数
+function loadSettings() {
+    chrome.storage.sync.get(['customSettings'], function(result) {
+        if (result.customSettings) {
+            currentSettings = { ...defaultSettings, ...result.customSettings };
+        }
+        applySettings();
+        populateSettingsUI();
+    });
+}
+
+function saveSettings() {
+    chrome.storage.sync.set({ customSettings: currentSettings }, function() {
+        applySettings();
+        settingsPanel.classList.remove('show');
+    });
+}
+
+function resetSettings() {
+    currentSettings = { ...defaultSettings };
+    populateSettingsUI();
+    applySettings();
+}
+
+function applySettings() {
+    // 颜色设置
+    document.body.style.backgroundColor = currentSettings.bgColor;
+    document.body.style.color = currentSettings.textColor;
+
+    const searchBox = document.querySelector('.search-box');
+    searchBox.style.backgroundColor = currentSettings.searchBgColor;
+    searchBox.style.borderColor = currentSettings.searchBorderColor;
+    searchBox.style.boxShadow = `0 1px 6px rgba(${hexToRgb(currentSettings.searchShadowColor)},.28)`;
+
+    document.querySelector('.search-icon svg').style.fill = currentSettings.iconColor;
+    document.querySelector('#search-input').style.color = currentSettings.textColor;
+
+    const settingsIcon = document.querySelector('.settings-icon');
+    const clearBgIcon = document.querySelector('.clear-bg-icon');
+    if (settingsIcon) settingsIcon.style.backgroundColor = currentSettings.btnBgColor;
+    if (clearBgIcon) clearBgIcon.style.backgroundColor = currentSettings.btnBgColor;
+
+    // 搜索框尺寸设置
+    searchBox.style.width = currentSettings.searchWidth + '%';
+    searchBox.style.maxWidth = currentSettings.searchWidth + '%';
+    searchBox.style.height = currentSettings.searchHeight + 'px';
+    searchBox.style.borderRadius = currentSettings.searchRadius + 'px';
+
+    const searchContainer = document.querySelector('.search-container');
+    searchContainer.style.marginTop = currentSettings.searchMarginTop + 'px';
+
+    // Logo 设置
+    searchLogo.style.height = currentSettings.logoHeight + 'px';
+    logoContainer.style.marginBottom = currentSettings.logoMargin + 'px';
+
+    // 透明度设置
+    document.body.style.opacity = currentSettings.bgOpacity / 100;
+}
+
+function hexToRgb(hex) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result
+        ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
+        : '0, 0, 0';
+}
+
+function populateSettingsUI() {
+    // 颜色输入
+    document.getElementById('bg-color').value = currentSettings.bgColor;
+    document.getElementById('bg-color-text').value = currentSettings.bgColor;
+    document.getElementById('text-color').value = currentSettings.textColor;
+    document.getElementById('text-color-text').value = currentSettings.textColor;
+    document.getElementById('search-bg-color').value = currentSettings.searchBgColor;
+    document.getElementById('search-bg-color-text').value = currentSettings.searchBgColor;
+    document.getElementById('search-border-color').value = currentSettings.searchBorderColor;
+    document.getElementById('search-border-color-text').value = currentSettings.searchBorderColor;
+    document.getElementById('search-border-hover-color').value = currentSettings.searchBorderHoverColor;
+    document.getElementById('search-border-hover-color-text').value = currentSettings.searchBorderHoverColor;
+    document.getElementById('search-shadow-color').value = currentSettings.searchShadowColor;
+    document.getElementById('search-shadow-color-text').value = currentSettings.searchShadowColor;
+    document.getElementById('btn-bg-color').value = currentSettings.btnBgColor;
+    document.getElementById('btn-bg-color-text').value = currentSettings.btnBgColor;
+    document.getElementById('icon-color').value = currentSettings.iconColor;
+    document.getElementById('icon-color-text').value = currentSettings.iconColor;
+
+    // 滑块设置
+    document.getElementById('search-width').value = currentSettings.searchWidth;
+    document.getElementById('search-width-value').textContent = currentSettings.searchWidth + '%';
+
+    document.getElementById('search-height').value = currentSettings.searchHeight;
+    document.getElementById('search-height-value').textContent = currentSettings.searchHeight + 'px';
+
+    document.getElementById('search-radius').value = currentSettings.searchRadius;
+    document.getElementById('search-radius-value').textContent = currentSettings.searchRadius + 'px';
+
+    document.getElementById('search-margin-top').value = currentSettings.searchMarginTop;
+    document.getElementById('search-margin-top-value').textContent = currentSettings.searchMarginTop + 'px';
+
+    document.getElementById('logo-height').value = currentSettings.logoHeight;
+    document.getElementById('logo-height-value').textContent = currentSettings.logoHeight + 'px';
+
+    document.getElementById('logo-margin').value = currentSettings.logoMargin;
+    document.getElementById('logo-margin-value').textContent = currentSettings.logoMargin + 'px';
+
+    document.getElementById('bg-opacity').value = currentSettings.bgOpacity;
+    document.getElementById('bg-opacity-value').textContent = currentSettings.bgOpacity + '%';
+
+    // 打开方式设置
+    if (currentSettings.openTarget === 'current') {
+        document.getElementById('open-current').checked = true;
+    } else {
+        document.getElementById('open-new').checked = true;
+    }
+}
+
+function setupSettingsEventListeners() {
+    // 打开/关闭设置面板
+    settingsBtn.addEventListener('click', () => {
+        settingsPanel.classList.add('show');
+    });
+
+    closeSettingsBtn.addEventListener('click', () => {
+        settingsPanel.classList.remove('show');
+    });
+
+    // ESC 键关闭
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && settingsPanel.classList.contains('show')) {
+            settingsPanel.classList.remove('show');
+        }
+    });
+
+    // 颜色输入同步
+    const colorInputs = [
+        { color: 'bg-color', text: 'bg-color-text', key: 'bgColor' },
+        { color: 'text-color', text: 'text-color-text', key: 'textColor' },
+        { color: 'search-bg-color', text: 'search-bg-color-text', key: 'searchBgColor' },
+        { color: 'search-border-color', text: 'search-border-color-text', key: 'searchBorderColor' },
+        { color: 'search-border-hover-color', text: 'search-border-hover-color-text', key: 'searchBorderHoverColor' },
+        { color: 'search-shadow-color', text: 'search-shadow-color-text', key: 'searchShadowColor' },
+        { color: 'btn-bg-color', text: 'btn-bg-color-text', key: 'btnBgColor' },
+        { color: 'icon-color', text: 'icon-color-text', key: 'iconColor' }
+    ];
+
+    colorInputs.forEach(({ color, text, key }) => {
+        const colorInput = document.getElementById(color);
+        const textInput = document.getElementById(text);
+
+        colorInput.addEventListener('input', (e) => {
+            textInput.value = e.target.value;
+            currentSettings[key] = e.target.value;
+            applySettings();
+        });
+
+        textInput.addEventListener('input', (e) => {
+            const value = e.target.value;
+            if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
+                colorInput.value = value;
+                currentSettings[key] = value;
+                applySettings();
+            }
+        });
+    });
+
+    // 滑块设置
+    const sliders = [
+        { id: 'search-width', valueId: 'search-width-value', key: 'searchWidth', suffix: '%' },
+        { id: 'search-height', valueId: 'search-height-value', key: 'searchHeight', suffix: 'px' },
+        { id: 'search-radius', valueId: 'search-radius-value', key: 'searchRadius', suffix: 'px' },
+        { id: 'search-margin-top', valueId: 'search-margin-top-value', key: 'searchMarginTop', suffix: 'px' },
+        { id: 'logo-height', valueId: 'logo-height-value', key: 'logoHeight', suffix: 'px' },
+        { id: 'logo-margin', valueId: 'logo-margin-value', key: 'logoMargin', suffix: 'px' },
+        { id: 'bg-opacity', valueId: 'bg-opacity-value', key: 'bgOpacity', suffix: '%' }
+    ];
+
+    sliders.forEach(({ id, valueId, key, suffix }) => {
+        const slider = document.getElementById(id);
+        const valueDisplay = document.getElementById(valueId);
+
+        slider.addEventListener('input', (e) => {
+            const value = parseInt(e.target.value);
+            currentSettings[key] = value;
+            valueDisplay.textContent = value + suffix;
+            applySettings();
+        });
+    });
+
+    // 打开方式设置
+    document.getElementById('open-current').addEventListener('change', (e) => {
+        currentSettings.openTarget = e.target.value;
+        applySettings();
+    });
+
+    document.getElementById('open-new').addEventListener('change', (e) => {
+        currentSettings.openTarget = e.target.value;
+        applySettings();
+    });
+
+    // 保存和重置按钮
+    saveSettingsBtn.addEventListener('click', saveSettings);
+    resetSettingsBtn.addEventListener('click', resetSettings);
 }
 
 init();
