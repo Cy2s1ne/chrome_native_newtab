@@ -585,3 +585,36 @@ body.loaded {
 .radio-label span {
     user-select: none;
 }
+
+/* 复选框样式 */
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #3c4043;
+}
+
+@media (prefers-color-scheme: dark) {
+    .checkbox-label {
+        color: #e8eaed;
+    }
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #4285f4;
+    cursor: pointer;
+}
+
+.checkbox-label span {
+    user-select: none;
+}

@@ -68,7 +68,9 @@ const defaultSettings = {
     // 透明度
     bgOpacity: 100,
     // 打开方式
-    openTarget: 'new'
+    openTarget: 'new',
+    // 搜索行为
+    clearSearchOnNewTab: false
 };
 
 let currentSettings = { ...defaultSettings };
@@ -313,6 +315,9 @@ function setupEventListeners() {
 
                 // 根据设置决定打开方式
                 if (currentSettings.openTarget === 'new') {
+                    if (currentSettings.clearSearchOnNewTab) {
+                        searchInput.value = '';
+                    }
                     chrome.tabs.create({ url: url });
                 } else {
                     chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
@@ -450,6 +455,9 @@ function populateSettingsUI() {
     } else {
         document.getElementById('open-new').checked = true;
     }
+
+    // 搜索行为设置
+    document.getElementById('clear-search-newtab').checked = currentSettings.clearSearchOnNewTab;
 }
 
 function setupSettingsEventListeners() {
@@ -532,6 +540,12 @@ function setupSettingsEventListeners() {
 
     document.getElementById('open-new').addEventListener('change', (e) => {
         currentSettings.openTarget = e.target.value;
+        applySettings();
+    });
+
+    // 搜索行为设置
+    document.getElementById('clear-search-newtab').addEventListener('change', (e) => {
+        currentSettings.clearSearchOnNewTab = e.target.checked;
         applySettings();
     });
 
